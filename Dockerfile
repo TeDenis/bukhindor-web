@@ -30,7 +30,7 @@ RUN flutter build web --release
 FROM nginx:alpine
 
 # Копируем собранные файлы из предыдущего этапа
-COPY --from=build /build/web /usr/share/nginx/html
+COPY --from=build /app/build/web /usr/share/nginx/html
 
 # Копируем конфигурацию nginx
 COPY nginx.conf /etc/nginx/nginx.conf
