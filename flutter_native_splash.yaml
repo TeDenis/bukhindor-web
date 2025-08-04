@@ -1,0 +1,14 @@
+flutter_native_splash:
+  # Цвет фона экрана загрузки (цвет пива)
+  color: "#FFA726"
+  
+  # Цвет фона для темной темы
+  color_dark: "#E65100"
+  
+  # Настройки для Android 12+
+  android_12:
+    color: "#FFA726"
+    color_dark: "#E65100"
+  
+  # Полноэкранный режим
+  fullscreen: true 
