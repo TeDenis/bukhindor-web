@@ -18,6 +18,6 @@ docker-compose up -d
 echo "✅ Проверка статуса контейнера..."
 docker-compose ps
 
-echo "🎉 Приложение запущено на http://localhost:5000"
+echo "🎉 Приложение запущено на http://localhost:8080"
 echo "📋 Логи: docker-compose logs -f"
 echo "🛑 Остановка: docker-compose down" 
