@@ -1,35 +1,42 @@
-# Stage 1: Build the Flutter web application
-FROM ubuntu:latest AS build-env
+# Используем официальный образ Flutter для сборки
+FROM dart:stable AS build
 
-# Install dependencies for Flutter build
-RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    unzip \
-    xz-utils \
-    libglu1-mesa \
-    fonts-droid-fallback \
-    lib32stdc++6 \
-    python3
+# Устанавливаем Flutter
+RUN git clone https://github.com/flutter/flutter.git /flutter
+ENV PATH="/flutter/bin:$PATH"
 
-# Clone Flutter SDK and set up environment
-RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
-ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
+# Создаем пользователя для Flutter
+RUN useradd -m -s /bin/bash flutter
+RUN chown -R flutter:flutter /flutter
 
-# Enable Flutter web support and build the application
+# Создаем рабочую директорию
 WORKDIR /app
-COPY . /app/
-RUN flutter config --enable-web
+RUN chown -R flutter:flutter /app
+
+# Копируем pubspec файлы
+COPY --chown=flutter:flutter pubspec.* ./
+
+# Получаем зависимости
+USER flutter
+RUN flutter pub get
+
+# Копируем исходный код
+COPY --chown=flutter:flutter . .
+
+# Собираем web приложение для продакшена
 RUN flutter build web --release
 
-# Stage 2: Serve the built application with Nginx
+# Используем nginx для раздачи статических файлов
 FROM nginx:alpine
 
-# Copy the built Flutter web assets from the build stage
-COPY --from=build-env /app/build/web /usr/share/nginx/html
+# Копируем собранные файлы из предыдущего этапа
+COPY --from=build /app/build/web /usr/share/nginx/html
 
-# Expose port 80 for web traffic
-EXPOSE 80
+# Копируем конфигурацию nginx
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Start Nginx
+# Открываем порт 5000
+EXPOSE 5000
+
+# Запускаем nginx
 CMD ["nginx", "-g", "daemon off;"]
