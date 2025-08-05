@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../auth/presentation/bloc/auth_bloc_simple.dart';
 import '../../../auth/presentation/widgets/owl_logo_widget.dart';
@@ -42,6 +43,8 @@ class HomePage extends StatelessWidget {
                 onSelected: (value) {
                   if (value == 'logout') {
                     context.read<AuthBloc>().add(AuthSignOutRequested());
+                  } else if (value == 'version') {
+                    context.go('/version');
                   }
                 },
                 itemBuilder: (context) => [
@@ -93,6 +96,17 @@ class HomePage extends StatelessWidget {
                   ),
                   const PopupMenuDivider(),
                   const PopupMenuItem(
+                    value: 'version',
+                    child: Row(
+                      children: [
+                        Icon(Icons.info),
+                        SizedBox(width: 12),
+                        Text('О приложении'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
                     value: 'logout',
                     child: Row(
                       children: [
@@ -123,7 +137,10 @@ class HomePage extends StatelessWidget {
                             const SizedBox(
                               width: 60,
                               height: 60,
-                              child: OwlLogoWidget(),
+                              child: OwlLogoWidget(
+                                size: 60,
+                                enableVersionAccess: true,
+                              ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -304,6 +321,20 @@ class HomePage extends StatelessWidget {
                                 },
                                 icon: const Icon(Icons.settings),
                                 label: const Text('Настройки'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () {
+                                  context.go('/version');
+                                },
+                                icon: const Icon(Icons.info),
+                                label: const Text('О приложении'),
                               ),
                             ),
                           ],

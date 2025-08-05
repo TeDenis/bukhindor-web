@@ -5,6 +5,7 @@ import '../../features/auth/presentation/bloc/auth_bloc_simple.dart';
 import '../../features/auth/presentation/pages/auth_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
+import '../../features/version/presentation/pages/version_page.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -13,6 +14,7 @@ class AppRouter {
       final authBloc = context.read<AuthBloc>();
       final isAuthenticated = authBloc.state is AuthAuthenticatedState;
       final isOnAuthPage = state.matchedLocation == '/auth';
+      final isOnVersionPage = state.matchedLocation == '/version';
 
       if (authBloc.state is AuthLoading) {
         return '/splash';
@@ -24,6 +26,7 @@ class AppRouter {
 
       if (!isAuthenticated &&
           !isOnAuthPage &&
+          !isOnVersionPage &&
           state.matchedLocation != '/splash') {
         return '/auth';
       }
@@ -42,6 +45,10 @@ class AppRouter {
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: '/version',
+        builder: (context, state) => const VersionPage(),
       ),
     ],
   );

@@ -237,7 +237,10 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               // Логотип совы с анимацией
-                              const OwlLogoWidget(),
+                              const OwlLogoWidget(
+                                size: 100,
+                                enableVersionAccess: true,
+                              ),
                               const SizedBox(height: 24),
 
                               // Название приложения с логотипом
