@@ -43,7 +43,4 @@ test/
 
 # Web assets (will be built)
 web/icons/
-web/manifest.json
-
-# Nginx config (copied separately)
-nginx.conf 
+web/manifest.json 
