@@ -2,8 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/auth/presentation/bloc/auth_bloc_simple.dart';
-import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/auth/presentation/pages/auth_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 
@@ -13,8 +12,7 @@ class AppRouter {
     redirect: (context, state) {
       final authBloc = context.read<AuthBloc>();
       final isAuthenticated = authBloc.state is AuthAuthenticatedState;
-      final isOnAuthPage = state.matchedLocation == '/login' || 
-                          state.matchedLocation == '/register';
+      final isOnAuthPage = state.matchedLocation == '/auth';
 
       if (authBloc.state is AuthLoading) {
         return '/splash';
@@ -24,8 +22,10 @@ class AppRouter {
         return '/home';
       }
 
-      if (!isAuthenticated && !isOnAuthPage && state.matchedLocation != '/splash') {
-        return '/login';
+      if (!isAuthenticated &&
+          !isOnAuthPage &&
+          state.matchedLocation != '/splash') {
+        return '/auth';
       }
 
       return null;
@@ -36,12 +36,8 @@ class AppRouter {
         builder: (context, state) => const SplashPage(),
       ),
       GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterPage(),
+        path: '/auth',
+        builder: (context, state) => const AuthPage(),
       ),
       GoRoute(
         path: '/home',
@@ -49,4 +45,4 @@ class AppRouter {
       ),
     ],
   );
-} 
+}
