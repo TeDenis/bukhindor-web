@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      # Принудительная пересборка без кэша
-      no_cache: false
     ports:
       - "8080:5000"
     container_name: bukhindor-web
