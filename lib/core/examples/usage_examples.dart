@@ -12,7 +12,7 @@ class UsageExamples {
   /// Пример использования констант
   static void constantsExample() {
     // Использование названия приложения
-    final appName = AppConstants.appName; // 'Bukhindor'
+    const appName = AppConstants.appName; // 'Bukhindor'
     
     // Использование текстов
     final loginText = AppConstants.authTexts['login']; // 'Войти'
@@ -21,7 +21,7 @@ class UsageExamples {
     final emailError = AppConstants.errorMessages['emailRequired']; // 'Email обязателен'
     
     // Использование размеров
-    final borderRadius = AppConstants.buttonBorderRadius; // 16.0
+    const borderRadius = AppConstants.buttonBorderRadius; // 16.0
   }
   
   /// Пример использования валидации
@@ -42,10 +42,10 @@ class UsageExamples {
     final date = DateTime.now();
     final formattedDate = FormatUtils.formatDate(date); // '25.12.2024'
     
-    final email = 'user@example.com';
+    const email = 'user@example.com';
     final maskedEmail = FormatUtils.maskEmail(email); // 'u***r@example.com'
     
-    final name = 'john doe';
+    const name = 'john doe';
     final formattedName = FormatUtils.formatDisplayName(name); // 'John doe'
   }
   
@@ -128,7 +128,7 @@ class UsageExamples {
   static Widget createPageExample(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppConstants.appName),
+        title: const Text(AppConstants.appName),
       ),
       body: Container(
         decoration: BoxDecoration(

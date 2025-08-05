@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,6 +31,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   late Animation<Offset> _slideAnimation;
   late Animation<double> _liquidAnimation;
   late Animation<double> _bubbleAnimation;
+  
+  // Для хаотичных пузырьков
+  final List<ChaoticBubble> _chaoticBubbles = [];
+  final Random _random = Random();
+  bool _hasValidationErrors = false;
 
   @override
   void initState() {
@@ -46,7 +52,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
     
     _liquidController = AnimationController(
-      duration: const Duration(milliseconds: 6000),
+      duration: const Duration(seconds: 8), // Замедляем волну
       vsync: this,
     );
     
@@ -68,7 +74,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     
     _liquidAnimation = Tween<double>(
       begin: 0.0,
-      end: 2 * pi,
+      end: 1.0, // Используем 0-1 вместо 0-2π для более плавной анимации
     ).animate(CurvedAnimation(
       parent: _liquidController,
       curve: Curves.linear,
@@ -86,7 +92,47 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     _fadeController.forward();
     _slideController.forward();
     _liquidController.repeat();
+    
+    // Непрерывная генерация пузырьков через listener
+    _liquidController.addListener(() {
+      // Генерируем пузырьки чаще - каждые 0.1 секунды (10% от цикла)
+      if (_liquidController.value % 0.1 < 0.005) {
+        setState(() {
+          if (_chaoticBubbles.length < 40) { // Увеличиваем лимит пузырьков
+            final screenWidth = MediaQuery.of(context).size.width;
+            final newBubble = ChaoticBubble(
+              x: 20.0 + _random.nextDouble() * (screenWidth - 40.0), // Распределяем по всей ширине экрана
+              y: MediaQuery.of(context).size.height,
+              size: 4.0 + _random.nextDouble() * 6.0, // Увеличиваем размер для лучшей видимости
+              speed: 20.0 + _random.nextDouble() * 60.0, // Больше вариативности в скорости
+              horizontalDrift: (_random.nextDouble() - 0.5) * 30.0, // Больше горизонтального движения
+              opacity: 0.7 + _random.nextDouble() * 0.3, // Увеличиваем непрозрачность
+              createdAt: DateTime.now().millisecondsSinceEpoch,
+            );
+            _chaoticBubbles.add(newBubble);
+          }
+        });
+      }
+      
+      // Обновляем позиции пузырьков
+      setState(() {
+        for (var bubble in _chaoticBubbles) {
+          bubble.update(1.0 / 60.0);
+        }
+        // Удаляем пузырьки, которые вышли за пределы экрана или лопнули
+        _chaoticBubbles.removeWhere((bubble) {
+          final popHeight = MediaQuery.of(context).size.height * 0.05;
+          final time = (DateTime.now().millisecondsSinceEpoch - bubble.createdAt) / 1000.0;
+          final popProgress = (time * 4.0) % (2 * pi);
+          
+          // Удаляем если пузырек вышел за пределы экрана или завершил анимацию лопания
+          return bubble.y < -50 || (bubble.y <= popHeight && popProgress >= 2 * pi);
+        });
+      });
+    });
   }
+  
+
 
   @override
   void dispose() {
@@ -112,6 +158,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 painter: LiquidPainter(
                   animation: _liquidAnimation.value,
                   bubbleAnimation: _bubbleAnimation.value,
+                  chaoticBubbles: _chaoticBubbles,
                 ),
               );
             },
@@ -120,7 +167,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           // Основной контент
           SafeArea(
             child: SingleChildScrollView(
-              child: Container(
+              child: SizedBox(
                 height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
                 child: Column(
                   children: [
@@ -151,7 +198,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
+                                  const Text(
                                     'Bukhindor',
                                     style: TextStyle(
                                       fontSize: 32,
@@ -184,21 +231,27 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       flex: 3,
                       child: SlideTransition(
                         position: _slideAnimation,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(40),
-                              topRight: Radius.circular(40),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, -10),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            height: _hasValidationErrors ? 600 : 500, // Динамическая высота
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(40),
+                                  topRight: Radius.circular(40),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, -10),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
                           child: BlocListener<AuthBloc, AuthState>(
                             listener: (context, state) {
                               if (state is AuthError) {
@@ -214,7 +267,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                 );
                               }
                             },
-                            child: Container(
+                            child: SingleChildScrollView(
                               padding: const EdgeInsets.all(32),
                               child: Form(
                                 key: _formKey,
@@ -287,6 +340,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                           }
                                           return null;
                                         },
+                                        onChanged: (value) {
+                                          if (_hasValidationErrors) {
+                                            setState(() {
+                                              _hasValidationErrors = false;
+                                            });
+                                          }
+                                        },
                                       ),
                                     ),
                                     const SizedBox(height: 16),
@@ -346,6 +406,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                           }
                                           return null;
                                         },
+                                        onChanged: (value) {
+                                          if (_hasValidationErrors) {
+                                            setState(() {
+                                              _hasValidationErrors = false;
+                                            });
+                                          }
+                                        },
                                       ),
                                     ),
                                     const SizedBox(height: 16),
@@ -385,10 +452,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                           onPressed: () {
                                             // TODO: Implement forgot password
                                           },
-                                          child: Text(
+                                          child: const Text(
                                             'Забыли пароль?',
                                             style: TextStyle(
-                                              color: const Color(0xFF667eea),
+                                              color: Color(0xFF667eea),
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -404,10 +471,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                         return Container(
                                           height: 56,
                                           decoration: BoxDecoration(
-                                            gradient: LinearGradient(
+                                            gradient: const LinearGradient(
                                               colors: [
-                                                const Color(0xFF667eea),
-                                                const Color(0xFF764ba2),
+                                                Color(0xFF667eea),
+                                                Color(0xFF764ba2),
                                               ],
                                             ),
                                             borderRadius: BorderRadius.circular(16),
@@ -421,7 +488,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                           ),
                                           child: ElevatedButton(
                                             onPressed: state is AuthLoading ? null : () {
-                                              if (_formKey.currentState!.validate()) {
+                                              final isValid = _formKey.currentState!.validate();
+                                              setState(() {
+                                                _hasValidationErrors = !isValid;
+                                              });
+                                              if (isValid) {
                                                 context.read<AuthBloc>().add(
                                                   AuthSignInRequested(
                                                     email: _emailController.text.trim(),
@@ -446,7 +517,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                                     ),
                                                   )
-                                                : Text(
+                                                : const Text(
                                                     'Войти',
                                                     style: TextStyle(
                                                       fontSize: 18,
@@ -504,10 +575,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                                           onPressed: () {
                                             // TODO: Navigate to registration page
                                           },
-                                          child: Text(
+                                          child: const Text(
                                             'Зарегистрироваться',
                                             style: TextStyle(
-                                              color: const Color(0xFF667eea),
+                                              color: Color(0xFF667eea),
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -523,14 +594,15 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
+                  ),
+                    ),
                   ],
-                ),
               ),
             ),
           ),
+        ),
         ],
-      ),
-    );
+    ));
   }
 }
 
@@ -538,8 +610,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 class LiquidPainter extends CustomPainter {
   final double animation;
   final double bubbleAnimation;
+  final List<ChaoticBubble> chaoticBubbles;
 
-  LiquidPainter({required this.animation, required this.bubbleAnimation});
+  LiquidPainter({
+    required this.animation, 
+    required this.bubbleAnimation,
+    required this.chaoticBubbles,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -565,20 +642,27 @@ class LiquidPainter extends CustomPainter {
     // Создаем плавную качающуюся жидкость как в бокале с зацикливанием
     path.moveTo(0, liquidTop);
     
+    // Используем время напрямую для бесконечной волны без циклов
+    final currentTime = DateTime.now().millisecondsSinceEpoch / 1000.0;
+    
     for (double x = 0; x <= size.width; x += 1) {
-      // Основная плавная волна с зацикливанием
-      final mainWave = sin(x * 0.008 + animation * 0.5) * 25;
+      // Истинно бесконечная волна без рывков - используем время напрямую
+      final waveLength = size.width;
+      const waveSpeed = 0.5; // Скорость движения волны
+      final offset = currentTime * waveSpeed * 2 * pi; // Непрерывное время
       
-      // Вторичные плавные волны с зацикливанием
-      final secondaryWave = sin(x * 0.015 + animation * 0.3) * 15 * 0.7;
-      final tertiaryWave = sin(x * 0.025 + animation * 0.7) * 10 * 0.5;
+      // Основная волна с более плавным движением
+      final mainWave = sin((x / waveLength * 2 * pi) + offset) * 18;
       
-      // Плавные колебания поверхности с зацикливанием
-      final surfaceRipple = sin(x * 0.04 + animation * 0.2) * 5 * 
-                           (sin(animation * 0.1) * 0.3 + 0.7);
+      // Вторичные волны с разными частотами и скоростями
+      final secondaryWave = sin((x / waveLength * 3 * pi) + offset * 1.1) * 10 * 0.5;
+      final tertiaryWave = sin((x / waveLength * 4 * pi) + offset * 0.7) * 6 * 0.3;
       
-      // Эффект наклона бокала с зацикливанием
-      final tiltEffect = sin(animation * 0.3) * 8 * (x / size.width - 0.5);
+      // Поверхностные колебания
+      final surfaceRipple = sin((x / waveLength * 7 * pi) + offset * 1.3) * 3 * 0.6;
+      
+      // Эффект наклона
+      final tiltEffect = sin(offset * 0.15) * 4 * (x / size.width - 0.5);
       
       final y = liquidTop + mainWave + secondaryWave + tertiaryWave + surfaceRipple + tiltEffect;
       path.lineTo(x, y);
@@ -608,9 +692,14 @@ class LiquidPainter extends CustomPainter {
       highlightPath.moveTo(0, liquidTop);
       
       for (double x = 0; x <= size.width; x += 1) {
-        final mainWave = sin(x * 0.008 + animation * 0.5 + i * 0.2) * 20;
-        final secondaryWave = sin(x * 0.015 + animation * 0.3 + i * 0.1) * 12 * 0.6;
-        final tiltEffect = sin(animation * 0.3 + i * 0.5) * 6 * (x / size.width - 0.5);
+        // Непрерывные блики
+        final waveLength = size.width;
+        final offset = animation * 2 * pi;
+        final highlightOffset = offset + i * 0.5; // Смещение для разных бликов
+        
+        final mainWave = sin((x / waveLength * 2 * pi) + highlightOffset) * 20;
+        final secondaryWave = sin((x / waveLength * 4 * pi) + highlightOffset * 1.2) * 12 * 0.6;
+        final tiltEffect = sin(highlightOffset * 0.4) * 6 * (x / size.width - 0.5);
         
         final y = liquidTop + mainWave + secondaryWave + tiltEffect;
         highlightPath.lineTo(x, y);
@@ -656,57 +745,94 @@ class LiquidPainter extends CustomPainter {
         stops: const [0.0, 0.7, 1.0],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
     
-    // Рисуем больше пузырьков
-    for (int i = 0; i < 25; i++) {
-      // Позиция пузырька
-      final bubbleX = (size.width * 0.05 + i * size.width * 0.04) % size.width;
+    // Рисуем хаотичные пузырьки
+    for (final bubble in chaoticBubbles) {
+      // Обновляем позицию пузырька
+      bubble.update(1.0 / 60.0); // Примерно 60 FPS
       
-      // Независимая анимация подъема пузырька
-      final bubbleProgress = (bubbleAnimation * 0.2 + i * 0.3) % (2 * pi);
-      final bubbleY = size.height - (bubbleProgress / (2 * pi)) * (size.height - liquidTop + 50);
-      
-      // Размер пузырька
-      final bubbleSize = 4 + sin(bubbleAnimation * 1.5 + i) * 2;
-      
-      // Проверяем, достиг ли пузырек поверхности
-      if (bubbleY <= liquidTop + 30) {
-        // Пузырек на поверхности - анимация лопания
-        final popProgress = (bubbleProgress * 3) % (2 * pi);
-        final popSize = bubbleSize * (1 + sin(popProgress) * 0.8);
-        final popOpacity = (1 - (popProgress / (2 * pi))).clamp(0.0, 1.0);
+      // Проверяем, достиг ли пузырек высоты 5% от верха экрана
+      final popHeight = size.height * 0.05; // 5% от высоты экрана
+      if (bubble.y <= popHeight) {
+        // Пузырек лопается на высоте 5% от верха - анимация лопания
+        final time = (DateTime.now().millisecondsSinceEpoch - bubble.createdAt) / 1000.0;
+        final popProgress = (time * 4.0) % (2 * pi);
+        final popSize = bubble.size * (1 + sin(popProgress) * 0.6);
+        final popOpacity = (bubble.opacity * (1 - (popProgress / (2 * pi)))).clamp(0.0, 1.0);
         
         final popPaint = Paint()
-          ..shader = RadialGradient(
-            colors: [
-              Colors.white.withOpacity(0.7 * popOpacity),
-              Colors.white.withOpacity(0.3 * popOpacity),
-              Colors.transparent,
-            ],
-            stops: const [0.0, 0.7, 1.0],
-          ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+          ..color = Colors.white.withOpacity(0.9 * popOpacity) // Увеличиваем яркость
+          ..style = PaintingStyle.fill;
         
         final popPath = Path();
         popPath.addOval(Rect.fromCenter(
-          center: Offset(bubbleX, liquidTop + 20),
+          center: Offset(bubble.x, popHeight),
           width: popSize,
           height: popSize,
         ));
         
         canvas.drawPath(popPath, popPaint);
-      } else {
-        // Пузырек поднимается
+      } else if (bubble.y > 0 && bubble.y < size.height) {
+        // Пузырек поднимается - рисуем его
         final bubblePath = Path();
         bubblePath.addOval(Rect.fromCenter(
-          center: Offset(bubbleX, bubbleY),
-          width: bubbleSize,
-          height: bubbleSize,
+          center: Offset(bubble.x, bubble.y),
+          width: bubble.size,
+          height: bubble.size,
         ));
         
-        canvas.drawPath(bubblePath, bubblePaint);
+        final bubblePaintDynamic = Paint()
+          ..color = Colors.white.withOpacity(bubble.opacity * 0.8) // Увеличиваем яркость
+          ..style = PaintingStyle.fill;
+        
+        canvas.drawPath(bubblePath, bubblePaintDynamic);
+        
+        // Добавляем блик для лучшей видимости
+        final highlightPaint = Paint()
+          ..color = Colors.white.withOpacity(bubble.opacity * 0.4)
+          ..style = PaintingStyle.fill;
+        
+        final highlightPath = Path();
+        highlightPath.addOval(Rect.fromCenter(
+          center: Offset(bubble.x - bubble.size * 0.2, bubble.y - bubble.size * 0.2),
+          width: bubble.size * 0.4,
+          height: bubble.size * 0.4,
+        ));
+        
+        canvas.drawPath(highlightPath, highlightPaint);
       }
     }
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+/// Модель для хаотичного пузырька
+class ChaoticBubble {
+  double x;
+  double y;
+  final double size;
+  final double speed;
+  final double horizontalDrift;
+  final double opacity;
+  final int createdAt;
+  
+  ChaoticBubble({
+    required this.x,
+    required this.y,
+    required this.size,
+    required this.speed,
+    required this.horizontalDrift,
+    required this.opacity,
+    required this.createdAt,
+  });
+  
+  /// Обновляет позицию пузырька
+  void update(double deltaTime) {
+    y -= speed * deltaTime;
+    
+    // Добавляем горизонтальное колебание
+    final time = (DateTime.now().millisecondsSinceEpoch - createdAt) / 1000.0;
+    x += sin(time * 2.0) * horizontalDrift * deltaTime;
+  }
 } 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'background_animation.dart';
+import 'beer_background_animation.dart';
 
 class AppLayout extends StatelessWidget {
   final Widget child;
@@ -7,10 +7,6 @@ class AppLayout extends StatelessWidget {
   final Widget? floatingActionButton;
   final Widget? bottomNavigationBar;
   final bool enableBackgroundAnimation;
-  final Color? waveColor;
-  final Color? bubbleColor;
-  final double waveOpacity;
-  final double bubbleOpacity;
 
   const AppLayout({
     super.key,
@@ -19,10 +15,6 @@ class AppLayout extends StatelessWidget {
     this.floatingActionButton,
     this.bottomNavigationBar,
     this.enableBackgroundAnimation = true,
-    this.waveColor,
-    this.bubbleColor,
-    this.waveOpacity = 0.1,
-    this.bubbleOpacity = 0.05,
   });
 
   @override
@@ -35,11 +27,8 @@ class AppLayout extends StatelessWidget {
     );
 
     if (enableBackgroundAnimation) {
-      content = BackgroundAnimation(
-        waveColor: waveColor,
-        bubbleColor: bubbleColor,
-        waveOpacity: waveOpacity,
-        bubbleOpacity: bubbleOpacity,
+      content = BeerBackgroundAnimation(
+        enabled: true,
         child: content,
       );
     }

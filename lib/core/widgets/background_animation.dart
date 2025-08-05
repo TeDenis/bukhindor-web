@@ -92,7 +92,7 @@ class _BackgroundAnimationState extends State<BackgroundAnimation>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Theme.of(context).colorScheme.background,
+                  Theme.of(context).colorScheme.surface,
                   Theme.of(context).colorScheme.surface,
                 ],
               ),
@@ -212,13 +212,14 @@ class WavePainter extends CustomPainter {
     final path = Path();
     path.moveTo(0, size.height);
     
+    // Исправляем рывки через фазовый сдвиг
+    final phase = animation.value * wave.speed * 2 * math.pi + wave.offset;
+    
     for (double x = 0; x <= size.width; x += 2) {
       final normalizedX = x / size.width;
       final y = size.height * 0.8 + 
                 wave.amplitude * 
-                math.sin((normalizedX * wave.frequency + 
-                         animation.value * wave.speed + 
-                         wave.offset) * 2 * math.pi);
+                math.sin(normalizedX * wave.frequency * 2 * math.pi + phase);
       path.lineTo(x, y);
     }
     

@@ -39,7 +39,7 @@ class AppTheme {
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: _surfaceColor,
         elevation: 0,
         shadowColor: _shadowColor,
@@ -71,7 +71,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: _primaryColor,
-          side: BorderSide(color: _primaryColor, width: 1.5),
+          side: const BorderSide(color: _primaryColor, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -87,26 +87,26 @@ class AppTheme {
         fillColor: _surfaceColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _borderColor, width: 1),
+          borderSide: const BorderSide(color: _borderColor, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _borderColor, width: 1),
+          borderSide: const BorderSide(color: _borderColor, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _primaryColor, width: 2),
+          borderSide: const BorderSide(color: _primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _accentColor, width: 1),
+          borderSide: const BorderSide(color: _accentColor, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _accentColor, width: 2),
+          borderSide: const BorderSide(color: _accentColor, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        labelStyle: TextStyle(
+        labelStyle: const TextStyle(
           color: _textSecondaryColor,
           fontSize: 16,
         ),
@@ -114,12 +114,12 @@ class AppTheme {
           color: _textSecondaryColor.withOpacity(0.7),
           fontSize: 16,
         ),
-        errorStyle: TextStyle(
+        errorStyle: const TextStyle(
           color: _accentColor,
           fontSize: 12,
         ),
       ),
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
         headlineLarge: TextStyle(
           color: _textPrimaryColor,
           fontSize: 32,
@@ -168,11 +168,11 @@ class AppTheme {
           fontWeight: FontWeight.w500,
         ),
       ),
-      iconTheme: IconThemeData(
+      iconTheme: const IconThemeData(
         color: _textPrimaryColor,
         size: 24,
       ),
-      dividerTheme: DividerThemeData(
+      dividerTheme: const DividerThemeData(
         color: _borderColor,
         thickness: 1,
         space: 1,
@@ -181,7 +181,7 @@ class AppTheme {
         backgroundColor: _surfaceColor,
         selectedColor: _primaryColor,
         disabledColor: _borderColor,
-        labelStyle: TextStyle(color: _textPrimaryColor),
+        labelStyle: const TextStyle(color: _textPrimaryColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -216,17 +216,17 @@ class AppTheme {
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFF2C3E50),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF2C3E50),
         elevation: 0,
         shadowColor: _shadowColor,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           color: Colors.white,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Colors.white),
         centerTitle: true,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -248,7 +248,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: _primaryColor,
-          side: BorderSide(color: _primaryColor, width: 1.5),
+          side: const BorderSide(color: _primaryColor, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -264,23 +264,23 @@ class AppTheme {
         fillColor: const Color(0xFF2C3E50),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _borderColor, width: 1),
+          borderSide: const BorderSide(color: _borderColor, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _borderColor, width: 1),
+          borderSide: const BorderSide(color: _borderColor, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _primaryColor, width: 2),
+          borderSide: const BorderSide(color: _primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _accentColor, width: 1),
+          borderSide: const BorderSide(color: _accentColor, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _accentColor, width: 2),
+          borderSide: const BorderSide(color: _accentColor, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         labelStyle: const TextStyle(
@@ -291,7 +291,7 @@ class AppTheme {
           color: Colors.white54,
           fontSize: 16,
         ),
-        errorStyle: TextStyle(
+        errorStyle: const TextStyle(
           color: _accentColor,
           fontSize: 12,
         ),
@@ -349,7 +349,7 @@ class AppTheme {
         color: Colors.white,
         size: 24,
       ),
-      dividerTheme: DividerThemeData(
+      dividerTheme: const DividerThemeData(
         color: _borderColor,
         thickness: 1,
         space: 1,
