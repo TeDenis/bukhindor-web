@@ -2,7 +2,12 @@
 .git
 .gitignore
 
-# Flutter
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Flutter/Dart
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -10,7 +15,7 @@
 .pub-cache/
 .pub/
 build/
-coverage/
+*.lock
 
 # IDE
 .vscode/
@@ -22,11 +27,13 @@ coverage/
 Thumbs.db
 
 # Logs
+logs/
 *.log
 
 # Documentation
-*.md
-!README.md
+README.md
+VERSIONING.md
+memory-bank/
 
 # Scripts
 scripts/
@@ -34,11 +41,9 @@ scripts/
 # Test files
 test/
 
-# Docker
-Dockerfile
-.dockerignore
-docker-compose*.yml
+# Web assets (will be built)
+web/icons/
+web/manifest.json
 
-# Temporary files
-*.tmp
-*.temp 
+# Nginx config (copied separately)
+nginx.conf 

@@ -20,11 +20,11 @@ COPY --chown=flutter:flutter pubspec.* ./
 USER flutter
 RUN flutter pub get
 
-# Копируем исходный код
+# Копируем исходный код (после получения зависимостей для лучшего кэширования)
 COPY --chown=flutter:flutter . .
 
-# Собираем web приложение для продакшена
-RUN flutter build web --release
+# Принудительно обновляем зависимости и собираем web приложение для продакшена
+RUN flutter clean && flutter pub get && flutter build web --release
 
 # Используем nginx для раздачи статических файлов
 FROM nginx:alpine
