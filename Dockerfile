@@ -1,45 +1,47 @@
-# Используем официальный образ Flutter для сборки
-FROM dart:stable AS build
+# Environemnt to install flutter and build web
+FROM debian:latest AS build-env
 
-# Устанавливаем Flutter
-RUN git clone https://github.com/flutter/flutter.git /flutter
-ENV PATH="/flutter/bin:$PATH"
+# install all needed stuff
+RUN apt-get update
+RUN apt-get install -y curl git unzip
 
-# Создаем пользователя для Flutter
-RUN useradd -m -s /bin/bash flutter
-RUN chown -R flutter:flutter /flutter
+# define variables
+ARG FLUTTER_SDK=/usr/local/flutter
+ARG FLUTTER_VERSION=3.10.5
+ARG APP=/app/
 
-# Создаем рабочую директорию
-WORKDIR /app
-RUN chown -R flutter:flutter /app
+#clone flutter
+RUN git clone https://github.com/flutter/flutter.git $FLUTTER_SDK
+# change dir to current flutter folder and make a checkout to the specific version
+RUN cd $FLUTTER_SDK && git fetch && git checkout $FLUTTER_VERSION
 
-# Копируем pubspec файлы
-COPY --chown=flutter:flutter pubspec.* ./
+# setup the flutter path as an enviromental variable
+ENV PATH="$FLUTTER_SDK/bin:$FLUTTER_SDK/bin/cache/dart-sdk/bin:${PATH}"
 
-# Получаем зависимости
-USER flutter
+# Start to run Flutter commands
+# doctor to see if all was installes ok
+RUN flutter doctor -v
+
+# create folder to copy source code
+RUN mkdir $APP
+# copy source code to folder
+COPY . $APP
+# stup new folder as the working directory
+WORKDIR $APP
+
+# Run build: 1 - clean, 2 - pub get, 3 - build web
+RUN flutter clean
 RUN flutter pub get
+RUN flutter build web
 
-# Копируем исходный код (после получения зависимостей для лучшего кэширования)
-COPY --chown=flutter:flutter . .
+# once heare the app will be compiled and ready to deploy
 
-# Очищаем, получаем зависимости и генерируем код
-RUN flutter clean && flutter pub get && dart run build_runner build --delete-conflicting-outputs
+# use nginx to deploy
+FROM nginx:1.25.2-alpine
 
-# Собираем web приложение для продакшена
-RUN flutter build web --release
+# copy the info of the builded web app to nginx
+COPY --from=build-env /app/build/web /usr/share/nginx/html
 
-# Используем nginx для раздачи статических файлов
-FROM nginx:alpine
-
-# Копируем собранные файлы из предыдущего этапа
-COPY --from=build /app/build/web /usr/share/nginx/html
-
-# Копируем конфигурацию nginx
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Открываем порт 5000
-EXPOSE 5000
-
-# Запускаем nginx
+# Expose and run nginx
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
