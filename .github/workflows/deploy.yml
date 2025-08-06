@@ -10,7 +10,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Execute SSH commands on DigitalOcean
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.HOSTNAME }}
           username: ${{ secrets.USERNAME }}
