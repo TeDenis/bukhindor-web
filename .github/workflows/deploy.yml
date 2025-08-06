@@ -17,6 +17,6 @@ jobs:
 
       - name: Deploy to Droplet
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DO_URL }} "/root/digital-ocean-github-actions-ci/scripts/deploy.sh"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DO_URL }} "/bukhindor-web/scripts/docker-build.sh"
           
           
