@@ -5,24 +5,26 @@ FROM dart:stable AS build
 RUN git clone https://github.com/flutter/flutter.git /flutter
 ENV PATH="/flutter/bin:$PATH"
 
+# Создаем пользователя для Flutter
+RUN useradd -m -s /bin/bash flutter
+RUN chown -R flutter:flutter /flutter
 
 # Создаем рабочую директорию
 WORKDIR /app
+RUN chown -R flutter:flutter /app
 
 # Копируем pubspec файлы
-#COPY --chown=flutter:flutter pubspec.* ./
-COPY . .
+COPY --chown=flutter:flutter pubspec.* ./
+
 # Получаем зависимости
-#USER flutter
-RUN flutter clean
+USER flutter
 RUN flutter pub get
-RUN flutter build web
 
 # Копируем исходный код (после получения зависимостей для лучшего кэширования)
-#COPY --chown=flutter:flutter . .
+COPY --chown=flutter:flutter . .
 
 # Принудительно обновляем зависимости и собираем web приложение для продакшена
-#RUN flutter clean && flutter pub get && flutter build web --release
+RUN flutter clean && flutter pub get && flutter build web --release
 
 # Используем nginx для раздачи статических файлов
 FROM nginx:alpine
