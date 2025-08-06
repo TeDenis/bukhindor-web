@@ -19,4 +19,5 @@ jobs:
           key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.KEY }}
           script: |
+            cd bukhindor-web
             ./bukhindor-web/scripts/docker-build.sh
