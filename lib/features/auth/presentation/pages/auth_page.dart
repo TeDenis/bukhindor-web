@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../bloc/auth_bloc_simple.dart';
 import '../widgets/owl_logo_widget.dart';
+import '../../../../core/utils/validation_utils.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -315,8 +316,43 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                                   if (state is AuthError) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(state.message),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              state.message,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            if (state.details != null) ...[
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                state.details!,
+                                                style: const TextStyle(
+                                                    fontSize: 12),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
                                         backgroundColor: Colors.red,
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        duration: const Duration(seconds: 5),
+                                      ),
+                                    );
+                                  } else if (state is AuthPasswordResetSent) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                          'Email для сброса пароля отправлен!',
+                                        ),
+                                        backgroundColor: Colors.green,
                                         behavior: SnackBarBehavior.floating,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
@@ -397,16 +433,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
             hintText: 'Email',
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Пожалуйста, введите email';
-              }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                  .hasMatch(value)) {
-                return 'Пожалуйста, введите корректный email';
-              }
-              return null;
-            },
+            validator: ValidationUtils.validateEmail,
           ),
           const SizedBox(height: 16),
 
@@ -420,15 +447,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                 _loginObscurePassword = !_loginObscurePassword;
               });
             },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Пожалуйста, введите пароль';
-              }
-              if (value.length < 6) {
-                return 'Пароль должен содержать минимум 6 символов';
-              }
-              return null;
-            },
+            validator: ValidationUtils.validatePassword,
           ),
           const SizedBox(height: 16),
 
@@ -481,8 +500,9 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
           // Кнопка входа
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
+              final isLoading = state is AuthSignInLoading;
               return _buildGradientButton(
-                onPressed: state is AuthLoading
+                onPressed: isLoading
                     ? null
                     : () {
                         final isValid = _loginFormKey.currentState!.validate();
@@ -498,7 +518,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                               );
                         }
                       },
-                child: state is AuthLoading
+                child: isLoading
                     ? const SizedBox(
                         width: 24,
                         height: 24,
@@ -588,15 +608,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
             controller: _registerNameController,
             hintText: 'Имя',
             icon: Icons.person_outline,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Пожалуйста, введите имя';
-              }
-              if (value.length < 2) {
-                return 'Имя должно содержать минимум 2 символа';
-              }
-              return null;
-            },
+            validator: ValidationUtils.validateName,
           ),
           const SizedBox(height: 16),
 
@@ -606,16 +618,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
             hintText: 'Email',
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Пожалуйста, введите email';
-              }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                  .hasMatch(value)) {
-                return 'Пожалуйста, введите корректный email';
-              }
-              return null;
-            },
+            validator: ValidationUtils.validateEmail,
           ),
           const SizedBox(height: 16),
 
@@ -629,15 +632,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                 _registerObscurePassword = !_registerObscurePassword;
               });
             },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Пожалуйста, введите пароль';
-              }
-              if (value.length < 6) {
-                return 'Пароль должен содержать минимум 6 символов';
-              }
-              return null;
-            },
+            validator: ValidationUtils.validatePassword,
           ),
           const SizedBox(height: 16),
 
@@ -652,15 +647,10 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                     !_registerObscureConfirmPassword;
               });
             },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Пожалуйста, подтвердите пароль';
-              }
-              if (value != _registerPasswordController.text) {
-                return 'Пароли не совпадают';
-              }
-              return null;
-            },
+            validator: (value) => ValidationUtils.validatePasswordConfirmation(
+              _registerPasswordController.text,
+              value,
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -695,8 +685,9 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
           // Кнопка регистрации
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
+              final isLoading = state is AuthSignUpLoading;
               return _buildGradientButton(
-                onPressed: _acceptTerms && state is! AuthLoading
+                onPressed: _acceptTerms && !isLoading
                     ? () {
                         final isValid =
                             _registerFormKey.currentState!.validate();
@@ -715,7 +706,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                         }
                       }
                     : null,
-                child: state is AuthLoading
+                child: isLoading
                     ? const SizedBox(
                         width: 24,
                         height: 24,
@@ -822,24 +813,16 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
             hintText: 'Email',
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Пожалуйста, введите email';
-              }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                  .hasMatch(value)) {
-                return 'Пожалуйста, введите корректный email';
-              }
-              return null;
-            },
+            validator: ValidationUtils.validateEmail,
           ),
           const SizedBox(height: 24),
 
           // Кнопка восстановления
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
+              final isLoading = state is AuthResetLoading;
               return _buildGradientButton(
-                onPressed: state is AuthLoading
+                onPressed: isLoading
                     ? null
                     : () {
                         final isValid =
@@ -848,22 +831,15 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                           _hasValidationErrors = !isValid;
                         });
                         if (isValid) {
-                          // TODO: Implement forgot password functionality
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                'Инструкции по восстановлению пароля отправлены на ваш email',
-                              ),
-                              backgroundColor: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          );
+                          context.read<AuthBloc>().add(
+                                AuthPasswordResetRequested(
+                                  email: _forgotPasswordEmailController.text
+                                      .trim(),
+                                ),
+                              );
                         }
                       },
-                child: state is AuthLoading
+                child: isLoading
                     ? const SizedBox(
                         width: 24,
                         height: 24,

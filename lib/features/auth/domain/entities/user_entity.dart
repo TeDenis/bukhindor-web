@@ -8,7 +8,8 @@ class UserEntity with _$UserEntity {
   const factory UserEntity({
     required String id,
     required String email,
-    String? displayName,
+    required String name,
+    @Default(true) bool isActive,
     String? photoURL,
     @Default(false) bool emailVerified,
     required DateTime createdAt,

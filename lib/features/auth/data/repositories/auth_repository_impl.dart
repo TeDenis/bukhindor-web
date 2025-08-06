@@ -2,30 +2,34 @@ import 'dart:async';
 
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/services/token_manager.dart';
+import '../../../../core/mappers/user_mapper.dart';
+import '../../../../core/models/api_models.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
+  final ApiService _apiService = ApiService();
   UserEntity? _currentUser;
-  final StreamController<UserEntity?> _authStateController = StreamController<UserEntity?>.broadcast();
+  final StreamController<UserEntity?> _authStateController =
+      StreamController<UserEntity?>.broadcast();
 
   @override
   Future<UserEntity?> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
-    // Быстрая мок-авторизация
-    if (email == 'demo@example.com' && password == 'password') {
-      _currentUser = UserEntity(
-        id: 'demo-user-id',
-        email: email,
-        displayName: 'Demo User',
-        emailVerified: true,
-        createdAt: DateTime.now().subtract(const Duration(days: 30)),
-        updatedAt: DateTime.now(),
-      );
+    try {
+      final loginRequest = LoginRequest(email: email, password: password);
+      final loginResponse = await _apiService.login(loginRequest);
+
+      // Получаем данные пользователя
+      final userResponse = await _apiService.getCurrentUser();
+      _currentUser = UserMapper.fromApiResponse(userResponse);
+
       _authStateController.add(_currentUser);
       return _currentUser;
-    } else {
-      throw Exception('Неверный email или пароль');
+    } catch (e) {
+      throw Exception('Ошибка входа: ${e.toString()}');
     }
   }
 
@@ -35,28 +39,52 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     String? displayName,
   }) async {
-    // Быстрая мок-регистрация
-    _currentUser = UserEntity(
-      id: 'new-user-${DateTime.now().millisecondsSinceEpoch}',
-      email: email,
-      displayName: displayName ?? email.split('@')[0],
-      emailVerified: false,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-    _authStateController.add(_currentUser);
-    return _currentUser;
+    try {
+      final registerRequest = RegisterRequest(
+        name: displayName ?? email.split('@')[0],
+        email: email,
+        password: password,
+      );
+
+      final registerResponse = await _apiService.register(registerRequest);
+      _currentUser = UserMapper.fromApiResponse(registerResponse.user);
+
+      _authStateController.add(_currentUser);
+      return _currentUser;
+    } catch (e) {
+      throw Exception('Ошибка регистрации: ${e.toString()}');
+    }
   }
 
   @override
   Future<void> signOut() async {
-    _currentUser = null;
-    _authStateController.add(null);
+    try {
+      await _apiService.logout();
+    } catch (e) {
+      // Игнорируем ошибки при выходе
+    } finally {
+      _currentUser = null;
+      _authStateController.add(null);
+    }
   }
 
   @override
   Future<UserEntity?> getCurrentUser() async {
-    return _currentUser;
+    try {
+      // Проверяем наличие токенов
+      if (!await TokenManager.hasTokens()) {
+        return null;
+      }
+
+      final userResponse = await _apiService.getCurrentUser();
+      _currentUser = UserMapper.fromApiResponse(userResponse);
+      return _currentUser;
+    } catch (e) {
+      // Если токены недействительны, очищаем их
+      await TokenManager.clearTokens();
+      _currentUser = null;
+      return null;
+    }
   }
 
   @override
@@ -64,7 +92,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> sendPasswordResetEmail(String email) async {
-    // Мок-отправка email
+    try {
+      final resetRequest = ResetPasswordRequest(email: email);
+      await _apiService.resetPassword(resetRequest);
+    } catch (e) {
+      throw Exception(
+          'Ошибка отправки email для сброса пароля: ${e.toString()}');
+    }
   }
 
   @override
@@ -73,15 +107,22 @@ class AuthRepositoryImpl implements AuthRepository {
     String? photoURL,
   }) async {
     if (_currentUser != null) {
-      _currentUser = _currentUser!.copyWith(
-        displayName: displayName ?? _currentUser!.displayName,
-        updatedAt: DateTime.now(),
-      );
-      _authStateController.add(_currentUser);
+      try {
+        final updateRequest = UpdateUserRequest(
+          name: displayName,
+        );
+
+        final userResponse =
+            await _apiService.updateUser(_currentUser!.id, updateRequest);
+        _currentUser = UserMapper.fromApiResponse(userResponse);
+        _authStateController.add(_currentUser);
+      } catch (e) {
+        throw Exception('Ошибка обновления профиля: ${e.toString()}');
+      }
     }
   }
 
   void dispose() {
     _authStateController.close();
   }
-} 
+}

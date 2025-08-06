@@ -57,6 +57,12 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
+class AuthSignInLoading extends AuthState {}
+
+class AuthSignUpLoading extends AuthState {}
+
+class AuthResetLoading extends AuthState {}
+
 class AuthAuthenticatedState extends AuthState {
   final UserEntity user;
 
@@ -67,8 +73,9 @@ class AuthUnauthenticatedState extends AuthState {}
 
 class AuthError extends AuthState {
   final String message;
+  final String? details;
 
-  AuthError({required this.message});
+  AuthError({required this.message, this.details});
 }
 
 class AuthPasswordResetSent extends AuthState {}
@@ -120,7 +127,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthSignInRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    emit(AuthSignInLoading());
     try {
       final user = await _authRepository.signInWithEmailAndPassword(
         email: event.email,
@@ -132,7 +139,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthUnauthenticatedState());
       }
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(
+        message: 'Ошибка входа в систему',
+        details: e.toString(),
+      ));
     }
   }
 
@@ -140,7 +150,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthSignUpRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    emit(AuthSignUpLoading());
     try {
       final user = await _authRepository.signUpWithEmailAndPassword(
         email: event.email,
@@ -153,7 +163,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthUnauthenticatedState());
       }
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(
+        message: 'Ошибка регистрации',
+        details: e.toString(),
+      ));
     }
   }
 
@@ -166,7 +179,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _authRepository.signOut();
       emit(AuthUnauthenticatedState());
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(
+        message: 'Ошибка выхода из системы',
+        details: e.toString(),
+      ));
     }
   }
 
@@ -174,11 +190,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthPasswordResetRequested event,
     Emitter<AuthState> emit,
   ) async {
+    emit(AuthResetLoading());
     try {
       await _authRepository.sendPasswordResetEmail(event.email);
       emit(AuthPasswordResetSent());
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(
+        message: 'Ошибка отправки email для сброса пароля',
+        details: e.toString(),
+      ));
     }
   }
 
@@ -191,14 +211,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         displayName: event.displayName,
         photoURL: event.photoURL,
       );
-      
+
       // Get updated user data
       final user = await _authRepository.getCurrentUser();
       if (user != null) {
         emit(AuthAuthenticatedState(user: user));
       }
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      emit(AuthError(
+        message: 'Ошибка обновления профиля',
+        details: e.toString(),
+      ));
     }
   }
 
@@ -215,4 +238,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) {
     emit(AuthUnauthenticatedState());
   }
-} 
+}

@@ -57,10 +57,7 @@ class HomePage extends StatelessWidget {
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                           child: Text(
-                            state.user.displayName
-                                    ?.substring(0, 1)
-                                    .toUpperCase() ??
-                                state.user.email.substring(0, 1).toUpperCase(),
+                            state.user.name.substring(0, 1).toUpperCase(),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontWeight: FontWeight.bold,
@@ -74,7 +71,7 @@ class HomePage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                state.user.displayName ?? 'Пользователь',
+                                state.user.name,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
                               ),
@@ -158,7 +155,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    state.user.displayName ?? 'Пользователь',
+                                    state.user.name,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium
@@ -204,7 +201,7 @@ class HomePage extends StatelessWidget {
                         _InfoRow(
                           icon: Icons.person,
                           label: 'Имя',
-                          value: state.user.displayName ?? 'Не указано',
+                          value: state.user.name,
                         ),
                         const SizedBox(height: 12),
                         _InfoRow(

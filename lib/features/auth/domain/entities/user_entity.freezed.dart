@@ -22,7 +22,8 @@ UserEntity _$UserEntityFromJson(Map<String, dynamic> json) {
 mixin _$UserEntity {
   String get id => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
-  String? get displayName => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  bool get isActive => throw _privateConstructorUsedError;
   String? get photoURL => throw _privateConstructorUsedError;
   bool get emailVerified => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
@@ -47,7 +48,8 @@ abstract class $UserEntityCopyWith<$Res> {
   $Res call(
       {String id,
       String email,
-      String? displayName,
+      String name,
+      bool isActive,
       String? photoURL,
       bool emailVerified,
       DateTime createdAt,
@@ -71,7 +73,8 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
   $Res call({
     Object? id = null,
     Object? email = null,
-    Object? displayName = freezed,
+    Object? name = null,
+    Object? isActive = null,
     Object? photoURL = freezed,
     Object? emailVerified = null,
     Object? createdAt = null,
@@ -86,10 +89,14 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      displayName: freezed == displayName
-          ? _value.displayName
-          : displayName // ignore: cast_nullable_to_non_nullable
-              as String?,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      isActive: null == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
       photoURL: freezed == photoURL
           ? _value.photoURL
           : photoURL // ignore: cast_nullable_to_non_nullable
@@ -121,7 +128,8 @@ abstract class _$$UserEntityImplCopyWith<$Res>
   $Res call(
       {String id,
       String email,
-      String? displayName,
+      String name,
+      bool isActive,
       String? photoURL,
       bool emailVerified,
       DateTime createdAt,
@@ -143,7 +151,8 @@ class __$$UserEntityImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? email = null,
-    Object? displayName = freezed,
+    Object? name = null,
+    Object? isActive = null,
     Object? photoURL = freezed,
     Object? emailVerified = null,
     Object? createdAt = null,
@@ -158,10 +167,14 @@ class __$$UserEntityImplCopyWithImpl<$Res>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      displayName: freezed == displayName
-          ? _value.displayName
-          : displayName // ignore: cast_nullable_to_non_nullable
-              as String?,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      isActive: null == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
       photoURL: freezed == photoURL
           ? _value.photoURL
           : photoURL // ignore: cast_nullable_to_non_nullable
@@ -188,7 +201,8 @@ class _$UserEntityImpl implements _UserEntity {
   const _$UserEntityImpl(
       {required this.id,
       required this.email,
-      this.displayName,
+      required this.name,
+      this.isActive = true,
       this.photoURL,
       this.emailVerified = false,
       required this.createdAt,
@@ -202,7 +216,10 @@ class _$UserEntityImpl implements _UserEntity {
   @override
   final String email;
   @override
-  final String? displayName;
+  final String name;
+  @override
+  @JsonKey()
+  final bool isActive;
   @override
   final String? photoURL;
   @override
@@ -215,7 +232,7 @@ class _$UserEntityImpl implements _UserEntity {
 
   @override
   String toString() {
-    return 'UserEntity(id: $id, email: $email, displayName: $displayName, photoURL: $photoURL, emailVerified: $emailVerified, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'UserEntity(id: $id, email: $email, name: $name, isActive: $isActive, photoURL: $photoURL, emailVerified: $emailVerified, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -225,8 +242,9 @@ class _$UserEntityImpl implements _UserEntity {
             other is _$UserEntityImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.displayName, displayName) ||
-                other.displayName == displayName) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
             (identical(other.photoURL, photoURL) ||
                 other.photoURL == photoURL) &&
             (identical(other.emailVerified, emailVerified) ||
@@ -239,8 +257,8 @@ class _$UserEntityImpl implements _UserEntity {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, email, displayName, photoURL,
-      emailVerified, createdAt, updatedAt);
+  int get hashCode => Object.hash(runtimeType, id, email, name, isActive,
+      photoURL, emailVerified, createdAt, updatedAt);
 
   /// Create a copy of UserEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -262,7 +280,8 @@ abstract class _UserEntity implements UserEntity {
   const factory _UserEntity(
       {required final String id,
       required final String email,
-      final String? displayName,
+      required final String name,
+      final bool isActive,
       final String? photoURL,
       final bool emailVerified,
       required final DateTime createdAt,
@@ -276,7 +295,9 @@ abstract class _UserEntity implements UserEntity {
   @override
   String get email;
   @override
-  String? get displayName;
+  String get name;
+  @override
+  bool get isActive;
   @override
   String? get photoURL;
   @override
