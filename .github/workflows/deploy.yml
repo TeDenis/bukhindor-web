@@ -20,6 +20,5 @@ jobs:
           passphrase: ${{ secrets.KEY }}
           script: |
             cd bukhindor-web
-            gil pull
-            ./scripts/generate_code.sh
+            git pull
             ./scripts/docker-build.sh
