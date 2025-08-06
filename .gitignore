@@ -53,10 +53,10 @@ firebase_options.dart
 .env.local
 .env.production
 
-# Generated files
-*.freezed.dart
-*.g.dart
-*.mocks.dart
+# Generated files (included in repo for Docker builds)
+# *.freezed.dart
+# *.g.dart
+# *.mocks.dart
 
 # Coverage
 coverage/

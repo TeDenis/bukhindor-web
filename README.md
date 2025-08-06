@@ -28,6 +28,9 @@ git clone <repository-url>
 cd bukhindor-web
 flutter pub get
 
+# Генерация кода (если изменяли модели)
+./scripts/generate_code.sh
+
 # Запуск
 flutter run -d chrome
 ```
@@ -41,6 +44,17 @@ flutter run -d chrome
 docker-compose up --build
 
 # Приложение доступно на http://localhost:8080
+```
+
+### Генерация кода
+```bash
+# Автоматическая генерация всех файлов
+./scripts/generate_code.sh
+
+# Или вручную
+flutter clean
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 ## 📁 Архитектура

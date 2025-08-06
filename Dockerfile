@@ -23,6 +23,9 @@ RUN flutter pub get
 # Копируем исходный код (после получения зависимостей для лучшего кэширования)
 COPY --chown=flutter:flutter . .
 
+# Генерируем код с помощью build_runner
+RUN dart run build_runner build --delete-conflicting-outputs
+
 # Принудительно обновляем зависимости и собираем web приложение для продакшена
 RUN flutter clean && flutter pub get && flutter build web --release
 
