@@ -18,4 +18,4 @@ class UserEntity with _$UserEntity {
 
   factory UserEntity.fromJson(Map<String, dynamic> json) =>
       _$UserEntityFromJson(json);
-} 
+}
