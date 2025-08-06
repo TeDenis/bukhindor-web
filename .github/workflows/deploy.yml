@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-    - name: Execute remote SSH commands using SSH key
+    - name: SSH key passphrase
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.HOSTNAME }}
@@ -17,4 +17,8 @@ jobs:
         key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
         passphrase: ${{ secrets.KEY }}
-        script: whoami
+        script: |
+          whoami
+          ls -al
+
+
