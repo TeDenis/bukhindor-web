@@ -9,16 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-    - name: SSH key passphrase
-      uses: appleboy/ssh-action@v1
-      with:
-        host: ${{ secrets.HOSTNAME }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
-        port: ${{ secrets.PORT }}
-        passphrase: ${{ secrets.KEY }}
-        script: |
-          whoami
-          ls -al
-
-
+      - name: Execute SSH commands on DigitalOcean
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTNAME }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            whoami
+            echo "Running commands on DigitalOcean Ubuntu 24.04 server"
+            # Add your commands here, e.g.:
+            # cd /path/to/your/app
+            # git pull origin main
+            # sudo systemctl restart your-service
