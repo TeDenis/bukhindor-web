@@ -8,15 +8,16 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 5
     steps:
-      - name: webfactory/ssh-agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
-
       - name: Deploy to Droplet
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DO_URL }} "/bukhindor-web/scripts/docker-build.sh"
-          
-          
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTNAME }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          command_timeout: 30m
+          script: |
+            ./bukhindor-web/scripts/docker-build.sh
+
