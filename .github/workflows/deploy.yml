@@ -16,6 +16,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
+          key: ${{ secret.DO_SSH_PRIVATE_KEY }}
           script: |
             whoami
             echo "Running commands on DigitalOcean Ubuntu 24.04 server"
