@@ -26,7 +26,7 @@ dependencies:
   url_launcher: ^6.2.1
   
   # JSON Serialization
-  json_annotation: ^4.8.2
+  json_annotation: ^4.9.0
   
   # HTTP & API
   dio: ^5.4.0
