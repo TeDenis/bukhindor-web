@@ -10,15 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Deploy to Droplet
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.HOSTNAME }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
-          port: ${{ secrets.PORT }}
-          passphrase: ${{ secrets.KEY }}
-          command_timeout: 30m
-          script: |
-            ./bukhindor-web/scripts/docker-build.sh
+    - name: SSH key passphrase
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.HOSTNAME }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+        port: ${{ secrets.PORT }}
+        passphrase: ${{ secrets.KEY }}
+        script: |
+          whoami
+          ls -al
+
 
