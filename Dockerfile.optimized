@@ -13,8 +13,8 @@ RUN flutter pub get
 # Copy source code (generated files should already be in repo)
 COPY . .
 
-# Skip code generation in Docker - use pre-generated files from repo
-# RUN dart run build_runner build --delete-conflicting-outputs
+# Generate code (required for Freezed classes)
+RUN dart run build_runner build --delete-conflicting-outputs
 
 # Build web app with optimizations for CI/CD
 RUN flutter build web --release --dart-define=FLUTTER_WEB_USE_SKIA=false
