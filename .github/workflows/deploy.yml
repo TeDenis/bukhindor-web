@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Execute SSH commands on DigitalOcean
         uses: appleboy/ssh-action@v1.2.2
