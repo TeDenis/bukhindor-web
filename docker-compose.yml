@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        FLUTTER_VERSION: "3.16.9"
     ports:
       - "8080:80"
     container_name: bukhindor-web
@@ -13,7 +15,7 @@ services:
       - ./logs:/var/log/nginx
     # Добавляем healthcheck для проверки работоспособности
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
       interval: 30s
       timeout: 10s
       retries: 3
