@@ -31,19 +31,43 @@ if [ "$1" = "optimized" ]; then
         . 2>/dev/null; then
         log "✅ Успешно собрано с Dockerfile.optimized"
     else
-        log "⚠️  Dockerfile.optimized не сработал, пробуем Dockerfile.fast..."
-        docker build \
+        log "⚠️  Dockerfile.optimized не сработал, пробуем Dockerfile.minimal..."
+        if docker build \
             --no-cache \
             --progress=plain \
-            -f Dockerfile.fast \
+            -f Dockerfile.minimal \
             -t bukhindor-web:latest \
-            .
-        log "✅ Успешно собрано с Dockerfile.fast"
+            . 2>/dev/null; then
+            log "✅ Успешно собрано с Dockerfile.minimal"
+        else
+            log "⚠️  Dockerfile.minimal не сработал, пробуем Dockerfile.fast..."
+            docker build \
+                --no-cache \
+                --progress=plain \
+                -f Dockerfile.fast \
+                -t bukhindor-web:latest \
+                .
+            log "✅ Успешно собрано с Dockerfile.fast"
+        fi
     fi
     
     log "▶️  Запуск контейнера..."
     docker run -d -p 8080:80 --name bukhindor-web bukhindor-web:latest
 
+elif [ "$1" = "minimal" ]; then
+    log "🔧 Используем минимальный Dockerfile (без генерации кода)..."
+    
+    # Сборка с минимальным Dockerfile
+    docker build \
+        --no-cache \
+        --progress=plain \
+        -f Dockerfile.minimal \
+        -t bukhindor-web:latest \
+        .
+    
+    log "▶️  Запуск контейнера..."
+    docker run -d -p 8080:80 --name bukhindor-web bukhindor-web:latest
+    
 elif [ "$1" = "fast" ]; then
     log "⚡ Используем быстрый Dockerfile..."
     
@@ -105,6 +129,7 @@ log "   Статус: docker ps | grep bukhindor-web"
 log ""
 log "💡 Доступные варианты запуска:"
 log "   ./scripts/ci-deploy.sh optimized  # Автоматический выбор оптимального Dockerfile"
+log "   ./scripts/ci-deploy.sh minimal    # Dockerfile.minimal (без генерации кода)"
 log "   ./scripts/ci-deploy.sh fast       # Dockerfile.fast (Ubuntu + Flutter)"
 log "   ./scripts/ci-deploy.sh local      # Локальная сборка Flutter"
 log "   ./scripts/ci-deploy.sh            # Стандартный docker-compose"
