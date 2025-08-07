@@ -15,7 +15,7 @@ docker-compose.yml
 .pub-cache/
 .pub/
 build/
-*.lock
+# *.lock  # Commented out to allow pubspec.lock
 
 # IDE
 .vscode/
