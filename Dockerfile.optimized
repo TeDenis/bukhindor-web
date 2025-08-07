@@ -1,5 +1,5 @@
 # Optimized Dockerfile for faster builds and CI/CD
-FROM cirrusci/flutter:3.16.9 AS build-env
+FROM ghcr.io/cirruslabs/flutter:3.16.9 AS build-env
 
 # Set working directory
 WORKDIR /app

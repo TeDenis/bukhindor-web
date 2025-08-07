@@ -20,13 +20,38 @@ docker-compose down || true
 
 # Выбор стратегии сборки
 if [ "$1" = "optimized" ]; then
-    log "🔧 Используем оптимизированный Dockerfile..."
+    log "🔧 Пробуем оптимизированный Dockerfile..."
     
-    # Сборка с оптимизированным Dockerfile
-    docker build \
+    # Пробуем сначала Dockerfile.optimized
+    if docker build \
         --no-cache \
         --progress=plain \
         -f Dockerfile.optimized \
+        -t bukhindor-web:latest \
+        . 2>/dev/null; then
+        log "✅ Успешно собрано с Dockerfile.optimized"
+    else
+        log "⚠️  Dockerfile.optimized не сработал, пробуем Dockerfile.fast..."
+        docker build \
+            --no-cache \
+            --progress=plain \
+            -f Dockerfile.fast \
+            -t bukhindor-web:latest \
+            .
+        log "✅ Успешно собрано с Dockerfile.fast"
+    fi
+    
+    log "▶️  Запуск контейнера..."
+    docker run -d -p 8080:80 --name bukhindor-web bukhindor-web:latest
+
+elif [ "$1" = "fast" ]; then
+    log "⚡ Используем быстрый Dockerfile..."
+    
+    # Сборка с быстрым Dockerfile
+    docker build \
+        --no-cache \
+        --progress=plain \
+        -f Dockerfile.fast \
         -t bukhindor-web:latest \
         .
     
@@ -77,3 +102,9 @@ log "📋 Полезные команды:"
 log "   Логи: docker logs -f bukhindor-web"
 log "   Остановка: docker stop bukhindor-web && docker rm bukhindor-web"
 log "   Статус: docker ps | grep bukhindor-web"
+log ""
+log "💡 Доступные варианты запуска:"
+log "   ./scripts/ci-deploy.sh optimized  # Автоматический выбор оптимального Dockerfile"
+log "   ./scripts/ci-deploy.sh fast       # Dockerfile.fast (Ubuntu + Flutter)"
+log "   ./scripts/ci-deploy.sh local      # Локальная сборка Flutter"
+log "   ./scripts/ci-deploy.sh            # Стандартный docker-compose"
