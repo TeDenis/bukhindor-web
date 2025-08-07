@@ -21,5 +21,4 @@ jobs:
           script: |
             cd bukhindor-web
             git pull
-            chmod +x scripts/ci-deploy.sh
-            ./scripts/ci-deploy.sh optimized
+            ./scripts/docker-build.sh
