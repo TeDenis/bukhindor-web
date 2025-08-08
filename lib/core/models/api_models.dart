@@ -5,7 +5,7 @@ part 'api_models.g.dart';
 
 // Request Models
 @freezed
-class RegisterRequest with _$RegisterRequest {
+abstract class RegisterRequest with _$RegisterRequest {
   const factory RegisterRequest({
     required String name,
     required String email,
@@ -17,7 +17,7 @@ class RegisterRequest with _$RegisterRequest {
 }
 
 @freezed
-class LoginRequest with _$LoginRequest {
+abstract class LoginRequest with _$LoginRequest {
   const factory LoginRequest({
     required String email,
     required String password,
@@ -28,27 +28,25 @@ class LoginRequest with _$LoginRequest {
 }
 
 @freezed
-class ResetPasswordRequest with _$ResetPasswordRequest {
-  const factory ResetPasswordRequest({
-    required String email,
-  }) = _ResetPasswordRequest;
+abstract class ResetPasswordRequest with _$ResetPasswordRequest {
+  const factory ResetPasswordRequest({required String email}) =
+      _ResetPasswordRequest;
 
   factory ResetPasswordRequest.fromJson(Map<String, dynamic> json) =>
       _$ResetPasswordRequestFromJson(json);
 }
 
 @freezed
-class RefreshTokenRequest with _$RefreshTokenRequest {
-  const factory RefreshTokenRequest({
-    required String refresh_token,
-  }) = _RefreshTokenRequest;
+abstract class RefreshTokenRequest with _$RefreshTokenRequest {
+  const factory RefreshTokenRequest({required String refresh_token}) =
+      _RefreshTokenRequest;
 
   factory RefreshTokenRequest.fromJson(Map<String, dynamic> json) =>
       _$RefreshTokenRequestFromJson(json);
 }
 
 @freezed
-class CreateUserRequest with _$CreateUserRequest {
+abstract class CreateUserRequest with _$CreateUserRequest {
   const factory CreateUserRequest({
     required String name,
     required String email,
@@ -60,7 +58,7 @@ class CreateUserRequest with _$CreateUserRequest {
 }
 
 @freezed
-class UpdateUserRequest with _$UpdateUserRequest {
+abstract class UpdateUserRequest with _$UpdateUserRequest {
   const factory UpdateUserRequest({
     String? name,
     String? email,
@@ -73,7 +71,7 @@ class UpdateUserRequest with _$UpdateUserRequest {
 
 // Response Models
 @freezed
-class UserResponse with _$UserResponse {
+abstract class UserResponse with _$UserResponse {
   const factory UserResponse({
     required String id,
     required String email,
@@ -88,7 +86,7 @@ class UserResponse with _$UserResponse {
 }
 
 @freezed
-class LoginResponse with _$LoginResponse {
+abstract class LoginResponse with _$LoginResponse {
   const factory LoginResponse({
     required String message,
     required LoginUserData user,
@@ -99,7 +97,7 @@ class LoginResponse with _$LoginResponse {
 }
 
 @freezed
-class LoginUserData with _$LoginUserData {
+abstract class LoginUserData with _$LoginUserData {
   const factory LoginUserData({
     required String access_token,
     required String refresh_token,
@@ -110,7 +108,7 @@ class LoginUserData with _$LoginUserData {
 }
 
 @freezed
-class RegisterResponse with _$RegisterResponse {
+abstract class RegisterResponse with _$RegisterResponse {
   const factory RegisterResponse({
     required String message,
     required UserResponse user,
@@ -121,7 +119,7 @@ class RegisterResponse with _$RegisterResponse {
 }
 
 @freezed
-class RefreshTokenResponse with _$RefreshTokenResponse {
+abstract class RefreshTokenResponse with _$RefreshTokenResponse {
   const factory RefreshTokenResponse({
     required String message,
     required LoginUserData user,
@@ -132,28 +130,24 @@ class RefreshTokenResponse with _$RefreshTokenResponse {
 }
 
 @freezed
-class MessageResponse with _$MessageResponse {
-  const factory MessageResponse({
-    required String message,
-  }) = _MessageResponse;
+abstract class MessageResponse with _$MessageResponse {
+  const factory MessageResponse({required String message}) = _MessageResponse;
 
   factory MessageResponse.fromJson(Map<String, dynamic> json) =>
       _$MessageResponseFromJson(json);
 }
 
 @freezed
-class ErrorResponse with _$ErrorResponse {
-  const factory ErrorResponse({
-    required String error,
-    required int code,
-  }) = _ErrorResponse;
+abstract class ErrorResponse with _$ErrorResponse {
+  const factory ErrorResponse({required String error, required int code}) =
+      _ErrorResponse;
 
   factory ErrorResponse.fromJson(Map<String, dynamic> json) =>
       _$ErrorResponseFromJson(json);
 }
 
 @freezed
-class UsersListResponse with _$UsersListResponse {
+abstract class UsersListResponse with _$UsersListResponse {
   const factory UsersListResponse({
     required List<UserResponse> users,
     required int total,
@@ -166,7 +160,7 @@ class UsersListResponse with _$UsersListResponse {
 }
 
 @freezed
-class HealthResponse with _$HealthResponse {
+abstract class HealthResponse with _$HealthResponse {
   const factory HealthResponse({
     required String status,
     required String service,
@@ -174,4 +168,4 @@ class HealthResponse with _$HealthResponse {
 
   factory HealthResponse.fromJson(Map<String, dynamic> json) =>
       _$HealthResponseFromJson(json);
-} 
+}

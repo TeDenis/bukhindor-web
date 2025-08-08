@@ -1,24 +1,27 @@
 # Use official Flutter image for more stable builds
 FROM dart:stable AS build-env
 
-# Install Flutter
-RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
-ENV PATH="/usr/local/flutter/bin:${PATH}"
+# Install Flutter (stable channel)
+RUN git clone -b stable https://github.com/flutter/flutter.git /usr/local/flutter
+ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/.pub-cache/bin:${PATH}"
 
 # Pre-download Flutter artifacts
-RUN flutter precache --web
+RUN flutter --version && flutter precache --web
 
 # Set working directory
 WORKDIR /app
 
-# Copy pubspec file first for better caching
-COPY pubspec.yaml ./
+# Copy pubspec files first for better caching
+COPY pubspec.* ./
 
 # Get dependencies
 RUN flutter pub get
 
 # Copy source code
 COPY . .
+
+# Ensure deps resolved for the full project context (harmless if unchanged)
+RUN flutter pub get
 
 # Generate code
 RUN dart run build_runner build --delete-conflicting-outputs
