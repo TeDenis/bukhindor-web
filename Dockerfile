@@ -26,8 +26,23 @@ RUN flutter pub get
 # Generate code
 RUN dart run build_runner build --delete-conflicting-outputs
 
-# Build web app
-RUN flutter build web --release
+# Build web app with compile-time defines (can be overridden at build time)
+ARG APP_VERSION=1.0.2
+ARG BUILD_NUMBER=1
+ARG BUILD_DATE
+ARG BUILD_COMMIT
+ARG BUILD_BRANCH=main
+ARG ENVIRONMENT=production
+ARG API_BASE_URL=
+
+RUN flutter build web --release \
+  --dart-define=APP_VERSION=${APP_VERSION} \
+  --dart-define=BUILD_NUMBER=${BUILD_NUMBER} \
+  --dart-define=BUILD_DATE=${BUILD_DATE} \
+  --dart-define=BUILD_COMMIT=${BUILD_COMMIT} \
+  --dart-define=BUILD_BRANCH=${BUILD_BRANCH} \
+  --dart-define=ENVIRONMENT=${ENVIRONMENT} \
+  --dart-define=API_BASE_URL=${API_BASE_URL}
 
 # Use nginx to serve the app
 FROM nginx:1.25.2-alpine

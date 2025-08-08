@@ -4,11 +4,26 @@ class AppConstants {
   static const String appDescription = 'Сервис пятничного вечера';
 
   // Version Info
-  static const String appVersion = '1.0.0';
-  static const String buildNumber = '1';
-  static const String buildDate = '2024-12-19';
-  static const String buildCommit = 'a1b2c3d';
-  static const String buildBranch = 'main';
+  static const String appVersion = String.fromEnvironment(
+    'APP_VERSION',
+    defaultValue: '1.0.0',
+  );
+  static const String buildNumber = String.fromEnvironment(
+    'BUILD_NUMBER',
+    defaultValue: '1',
+  );
+  static const String buildDate = String.fromEnvironment(
+    'BUILD_DATE',
+    defaultValue: 'unknown',
+  );
+  static const String buildCommit = String.fromEnvironment(
+    'BUILD_COMMIT',
+    defaultValue: 'unknown',
+  );
+  static const String buildBranch = String.fromEnvironment(
+    'BUILD_BRANCH',
+    defaultValue: 'main',
+  );
 
   // Release Info
   static const String releaseNotes = '''
@@ -40,12 +55,17 @@ class AppConstants {
       'https://github.com/TeDenis/bukhindor-web';
 
   // Environment
-  static const String environment =
-      'production'; // 'development', 'staging', 'production'
+  static const String environment = String.fromEnvironment(
+    'ENVIRONMENT',
+    defaultValue: 'production',
+  ); // 'development', 'staging', 'production'
   static const bool isDebugMode = false;
 
   // API Configuration
-  static const String apiBaseUrl = 'https://api.bukhindor.com';
+  static const String apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: '',
+  );
   static const int apiTimeout = 30000; // milliseconds
 
   // Animation Configuration

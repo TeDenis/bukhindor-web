@@ -10,32 +10,34 @@ class ApiService {
   bool _isRefreshing = false;
 
   ApiService() {
-    _dio = Dio(BaseOptions(
-      baseUrl: ApiConfig.baseUrl,
+    final options = BaseOptions(
       connectTimeout: ApiConfig.connectTimeout,
       receiveTimeout: ApiConfig.receiveTimeout,
-      headers: {
-        'Content-Type': ApiConfig.contentType,
-      },
-    ));
+      headers: {'Content-Type': ApiConfig.contentType},
+    );
+    if (ApiConfig.baseUrl.isNotEmpty) {
+      options.baseUrl = ApiConfig.baseUrl;
+    }
+    _dio = Dio(options);
 
     // Добавляем retry interceptor
-    _dio.interceptors.add(RetryInterceptor(
-      dio: _dio,
-      logPrint: print,
-      retries: ApiConfig.maxRetries,
-      retryDelays: const [
-        Duration(seconds: 1),
-        Duration(seconds: 2),
-        Duration(seconds: 3),
-      ],
-    ));
+    _dio.interceptors.add(
+      RetryInterceptor(
+        dio: _dio,
+        logPrint: print,
+        retries: ApiConfig.maxRetries,
+        retryDelays: const [
+          Duration(seconds: 1),
+          Duration(seconds: 2),
+          Duration(seconds: 3),
+        ],
+      ),
+    );
 
     // Добавляем auth interceptor
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: _onRequest,
-      onError: _onError,
-    ));
+    _dio.interceptors.add(
+      InterceptorsWrapper(onRequest: _onRequest, onError: _onError),
+    );
   }
 
   // Interceptor для добавления токенов к запросам
@@ -61,7 +63,7 @@ class ApiService {
   ) async {
     if (err.response?.statusCode == 401 && !_isRefreshing) {
       _isRefreshing = true;
-      
+
       try {
         final refreshToken = await TokenManager.getRefreshToken();
         if (refreshToken != null) {
@@ -69,20 +71,20 @@ class ApiService {
             ApiConfig.authRefresh,
             data: RefreshTokenRequest(refresh_token: refreshToken).toJson(),
           );
-          
+
           final refreshResponse = RefreshTokenResponse.fromJson(response.data);
-          
+
           // Сохраняем новые токены
           await TokenManager.saveTokens(
             accessToken: refreshResponse.user.access_token,
             refreshToken: refreshResponse.user.refresh_token,
           );
-          
+
           // Повторяем оригинальный запрос с новым токеном
           final newToken = await TokenManager.getAccessToken();
           err.requestOptions.headers[ApiConfig.authorizationHeader] =
               '${ApiConfig.bearerPrefix}$newToken';
-          
+
           final retryResponse = await _dio.fetch(err.requestOptions);
           handler.resolve(retryResponse);
           return;
@@ -94,15 +96,15 @@ class ApiService {
         _isRefreshing = false;
       }
     }
-    
+
     handler.next(err);
   }
 
   // Проверка защищенных эндпоинтов
   bool _isProtectedEndpoint(String path) {
     return path.startsWith('/api/v1/auth/me') ||
-           path.startsWith('/api/v1/users') ||
-           path.startsWith('/api/v1/');
+        path.startsWith('/api/v1/users') ||
+        path.startsWith('/api/v1/');
   }
 
   // Health check
@@ -126,15 +128,15 @@ class ApiService {
       ApiConfig.authLogin,
       data: request.toJson(),
     );
-    
+
     final loginResponse = LoginResponse.fromJson(response.data);
-    
+
     // Сохраняем токены
     await TokenManager.saveTokens(
       accessToken: loginResponse.user.access_token,
       refreshToken: loginResponse.user.refresh_token,
     );
-    
+
     return loginResponse;
   }
 
@@ -159,39 +161,30 @@ class ApiService {
       ApiConfig.authRefresh,
       data: request.toJson(),
     );
-    
+
     final refreshResponse = RefreshTokenResponse.fromJson(response.data);
-    
+
     // Сохраняем новые токены
     await TokenManager.saveTokens(
       accessToken: refreshResponse.user.access_token,
       refreshToken: refreshResponse.user.refresh_token,
     );
-    
+
     return refreshResponse;
   }
 
   // Получение списка пользователей
-  Future<UsersListResponse> getUsers({
-    int page = 1,
-    int limit = 20,
-  }) async {
+  Future<UsersListResponse> getUsers({int page = 1, int limit = 20}) async {
     final response = await _dio.get(
       ApiConfig.users,
-      queryParameters: {
-        'page': page,
-        'limit': limit,
-      },
+      queryParameters: {'page': page, 'limit': limit},
     );
     return UsersListResponse.fromJson(response.data);
   }
 
   // Создание пользователя
   Future<UserResponse> createUser(CreateUserRequest request) async {
-    final response = await _dio.post(
-      ApiConfig.users,
-      data: request.toJson(),
-    );
+    final response = await _dio.post(ApiConfig.users, data: request.toJson());
     return UserResponse.fromJson(response.data);
   }
 
@@ -220,4 +213,4 @@ class ApiService {
   Future<void> logout() async {
     await TokenManager.clearTokens();
   }
-} 
+}
