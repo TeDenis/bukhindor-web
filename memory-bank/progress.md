@@ -68,3 +68,4 @@
 - Исправлены мета-теги (`mobile-web-app-capable`) и расширен CSP в `web/index.html`
 - Явный `Content-Type` для `manifest.json` и кэширование json
  - GH Actions: нормализован тег образа (`IMAGE_NAME`) до lower-case перед `docker buildx build` и в deploy-скрипте
+ - GH Actions: деплой без реестра — сборка образа на сервере (`docker build`) и запуск контейнера локально под тегом `bukhindor-web`

@@ -11,6 +11,7 @@ permissions:
 
 env:
   TAG: ${{ github.sha }}
+  IMAGE_NAME: bukhindor-web
 
 jobs:
   deploy:
@@ -27,16 +28,15 @@ jobs:
           passphrase: ${{ secrets.KEY }}
           script: |
             set -e
-            echo "Logging into GHCR..."
+            echo "Building locally on the server..."
             cd bukhindor-web
 
             IMAGE=$(echo '${{ env.IMAGE_NAME }}' | tr '[:upper:]' '[:lower:]')
             TAG='${{ env.TAG }}'
             git pull
-            docker buildx build \
-            --push \
-            --tag $IMAGE_NAME_LC:$TAG \
-            --tag $IMAGE_NAME_LC:latest \
+            docker build \
+            --tag $IMAGE:$TAG \
+            --tag $IMAGE:latest \
             --build-arg APP_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}') \
             --build-arg BUILD_NUMBER=1 \
             --build-arg BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
