@@ -69,3 +69,4 @@
 - Явный `Content-Type` для `manifest.json` и кэширование json
  - GH Actions: нормализован тег образа (`IMAGE_NAME`) до lower-case перед `docker buildx build` и в deploy-скрипте
  - GH Actions: деплой без реестра — сборка образа на сервере (`docker build`) и запуск контейнера локально под тегом `bukhindor-web`
+ - Docker: добавлено явное копирование `web/manifest.json` и `web/icons/load.svg` в образ, чтобы исключить 404 на проде

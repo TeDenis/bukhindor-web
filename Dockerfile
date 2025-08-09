@@ -53,5 +53,10 @@ COPY --from=build-env /app/build/web /usr/share/nginx/html
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
+# Ensure PWA manifest and custom loading icon are present (Flutter may not copy custom files in web/)
+RUN mkdir -p /usr/share/nginx/html/icons
+COPY web/manifest.json /usr/share/nginx/html/manifest.json
+COPY web/icons/load.svg /usr/share/nginx/html/icons/load.svg
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"] 

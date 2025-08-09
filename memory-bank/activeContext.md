@@ -36,6 +36,7 @@
  - ✅ CI/CD: нормализовано `IMAGE_NAME` в lower-case в `.github/workflows/deploy.yml` для GHCR
 - ✅ CI/CD: деплой без push в реестр — сборка образа и запуск контейнера выполняются напрямую на сервере по SSH (`docker build`, локальный тег `bukhindor-web`)
 - ⚠️ **ПРОБЛЕМА С DOCKER**: Сгенерированные файлы не попадают в финальную сборку после flutter clean
+ - ✅ Исправлен 404 для `/manifest.json` и `/icons/load.svg`: добавлено явное копирование этих файлов в образ Nginx во всех Dockerfile
 
 ## Текущее состояние
 - **Полная интеграция с API** `https://api.go-dev.kz`:
