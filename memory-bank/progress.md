@@ -67,3 +67,4 @@
 - Nginx proxy `/api` -> `https://api.go-dev.kz` для обхода CORS
 - Исправлены мета-теги (`mobile-web-app-capable`) и расширен CSP в `web/index.html`
 - Явный `Content-Type` для `manifest.json` и кэширование json
+ - GH Actions: нормализован тег образа (`IMAGE_NAME`) до lower-case перед `docker buildx build` и в deploy-скрипте
