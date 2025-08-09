@@ -63,6 +63,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
+          passphrase: ${{ secrets.SSH_KEY_PASSWORD }}
           script: |
             set -e
             echo "Logging into GHCR..."
